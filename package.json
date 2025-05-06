@@ -1,0 +1,35 @@
+{
+  "name": "motivation-buddy",
+  "version": "1.0.0",
+  "description": "This is a Telegram Bot which gives daily motivational quotes to brighten your day!",
+  "keywords": [
+    "Backend",
+    "NodeJS",
+    "ExpressJS",
+    "Packages",
+    "Telegram",
+    "Telegraph",
+    "Dotenv"
+  ],
+  "homepage": "https://github.com/narendrajethi220/Motivation-Buddy#readme",
+  "bugs": {
+    "url": "https://github.com/narendrajethi220/Motivation-Buddy/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/narendrajethi220/Motivation-Buddy.git"
+  },
+  "license": "ISC",
+  "author": "Narendra Singh Jethi X Grok",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "axios": "^1.9.0",
+    "dotenv": "^16.5.0",
+    "node-schedule": "^2.1.1",
+    "telegraf": "^4.16.3"
+  }
+}
