@@ -1,10 +1,12 @@
 // link to the bot --> https://t.me/StayMotivatedBuddyBot
 const { Telegraf } = require("telegraf");
+const schedule = require("node-schedule");
 const getRandomQuote = require("./getRandomQuote");
 require("dotenv").config();
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
 
+const userSchedules = {};
 // start command
 bot.start((ctx) => {
   ctx.reply(
@@ -36,6 +38,42 @@ bot.catch((err, ctx) => {
   ctx.reply("Something went wrong. Please try again!");
 });
 
+// daily quote
+bot.command("daily", (ctx) => {
+  ctx.reply('Enter the hour (0-23) for daily quotes (e.g., "8" for 8 AM):');
+  ctx.session = { awaitingHour: true };
+});
+
+bot.on("text", async (ctx) => {
+  if (ctx.session && ctx.session.awaitingHour) {
+    const hour = parseInt(ctx.message.text);
+    if (isNaN(hour) || hour < 0 || hour > 23) {
+      ctx.reply("Please enter a valid hour (0-23)");
+      return;
+    }
+
+    const userId = ctx.from.id;
+
+    if (userSchedules[userId]) {
+      userSchedules[userId].cancel();
+      console.log(`Cancelled previous schedule for user: ${userId}`);
+    }
+
+    userSchedules[userId] = schedule.scheduleJob(
+      { hour, minute: 0 },
+      async () => {
+        console.log(`Sending daily quote to user :${userId} at ${hour}:00`);
+        const quote = await getRandomQuote();
+        ctx.telegram.sendMessage(userId, `Your daily motivation: ${quote}`);
+      }
+    );
+
+    ctx.reply(`Daily quotes scheduled for ${hour}:00!`);
+    ctx.session.awaitingHour = false;
+    console.log(`Schedule daily quote for user:${userId} at ${hour}:00`);
+  }
+});
+
 const url = "https://t.me/StayMotivatedBuddyBot";
 
 bot.launch().then(() => {
@@ -43,3 +81,4 @@ bot.launch().then(() => {
 });
 
 process.once("SIGINT", () => bot.stop("SIGNINT"));
+process.once("SIGTERM", () => bot.stop("SIGTERM"));
