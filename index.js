@@ -1,13 +1,16 @@
 // link to the bot --> https://t.me/StayMotivatedBuddyBot
-const { Telegraf } = require("telegraf");
+const { Telegraf, session } = require("telegraf");
 const schedule = require("node-schedule");
 const getRandomQuote = require("./getRandomQuote");
 require("dotenv").config();
 
 const bot = new Telegraf(process.env.BOT_TOKEN);
-
+bot.use(session());
 const userSchedules = {};
 // start command
+
+bot.hears("hi", (ctx) => ctx.reply("Hey there 🙋‍♂️"));
+
 bot.start((ctx) => {
   ctx.reply(
     "Welcome to Motivation Buddy! 🌟\n" +
@@ -40,11 +43,12 @@ bot.catch((err, ctx) => {
 
 // daily quote
 bot.command("daily", (ctx) => {
-  ctx.reply('Enter the hour (0-23) for daily quotes (e.g., "8" for 8 AM):');
   ctx.session = { awaitingHour: true };
+  ctx.reply('Enter the hour (0-23) for daily quotes (e.g., "8" for 8 AM):');
 });
 
 bot.on("text", async (ctx) => {
+  console.log(ctx.session);
   if (ctx.session && ctx.session.awaitingHour) {
     const hour = parseInt(ctx.message.text);
     if (isNaN(hour) || hour < 0 || hour > 23) {
@@ -73,7 +77,6 @@ bot.on("text", async (ctx) => {
     console.log(`Schedule daily quote for user:${userId} at ${hour}:00`);
   }
 });
-
 const url = "https://t.me/StayMotivatedBuddyBot";
 
 bot.launch().then(() => {
